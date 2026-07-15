@@ -1202,18 +1202,15 @@
     <tr class="song-row" data-id="${song.id}">
       <td>
         <div class="song-cell">
-          <div class="song-thumb">${song.icon}</div>
           <div class="song-meta">
-            <strong>${escapeHTML(song.title)}</strong>
-            <span>${escapeHTML(song.artist)}</span>
+            <strong>${escapeHTML(song.track_name)}</strong>
+            <span>${escapeHTML(song.artists)}</span>
           </div>
         </div>
       </td>
-      <td>${escapeHTML(song.album)}</td>
-      <td><span class="badge">${song.genre}</span></td>
-      <td>${fmtDuration(song.duration)}</td>
-      <td>${song.year}</td>
-      <td>
+      <td>${escapeHTML(song.album_name)}</td>
+      <td><span class="badge">${song.track_genre}</span></td>
+      <td>${fmtDuration(song.duration_ms/60000)}</td>      <td>
         <div class="row-actions">
           <button class="icon-btn recommend-icon" data-id="${song.id}" title="Get recommendations">
             <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
@@ -1247,7 +1244,7 @@
     <table class="song-table">
       <thead>
         <tr>
-          <th>Title</th><th>Album</th><th>Genre</th><th>Duration</th><th>Year</th><th></th>
+          <th>Title</th><th>Album</th><th>Genre</th><th>Duration</th><th></th>
         </tr>
       </thead>
       <tbody>
@@ -1311,7 +1308,7 @@
         }
         resultsDiv.innerHTML = `
       <table class="song-table">
-        <thead><tr><th>Title</th><th>Album</th><th>Genre</th><th>Duration</th><th>Year</th><th></th></tr></thead>
+        <thead><tr><th>Title</th><th>Album</th><th>Genre</th><th>Duration</th><th></th></tr></thead>
         <tbody>${results.map(s => songRowHTML(s)).join('')}</tbody>
       </table>
     `;
@@ -1530,7 +1527,6 @@
       const album = document.getElementById('addAlbum').value.trim() || 'Single';
       const genre = document.getElementById('addGenre').value;
       const duration = parseInt(document.getElementById('addDuration').value) || 180;
-      const year = parseInt(document.getElementById('addYear').value) || new Date().getFullYear();
 
       if (!title || !artist) {
         showToast("Please fill in at least a title and artist.", "error");
@@ -1538,7 +1534,7 @@
       }
 
       const features = readFeatureForm('add');
-      const payload = { title, artist, album, genre, duration, year, features };
+      const payload = { title, artists, album_name, genre, duration, features };
 
       const btn = document.getElementById('addSongBtn');
       btn.disabled = true;
