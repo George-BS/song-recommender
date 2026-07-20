@@ -1,6 +1,3 @@
-from os import getenv
-
-from dotenv import load_dotenv
 import psycopg
 from psycopg.rows import dict_row
 
@@ -9,9 +6,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .song_model import SongUpdate
 
-load_dotenv()
+import os
 
-DATABASE_URL = getenv("DATABASE_URL")
+DATABASE_URL = os.environ["DATABASE_URL"]
+
 
 app = FastAPI()
 
