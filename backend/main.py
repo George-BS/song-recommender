@@ -7,6 +7,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from .song_model import SongUpdate
 
 import os
+import pickle 
+from pathlib import Path
+import joblib
+
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PATH = BASE_DIR / "model.pkl"
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 
@@ -48,12 +54,22 @@ def execute(query: str, params: tuple = ()):
 # --------------------------
 # Endpoints
 # --------------------------
+
+
+
 @app.get("/")
 def root():
     return {
         "status": "ok",
         "message": "Song Recommendation API"
     }
+
+@app.get("songs/{track_id}")
+def get_song_by_id(track_id: str):
+    return fetch_all(
+        "SELECT * FROM songs WHERE track_id = %s",
+        (track_id,),
+    )
 
 @app.get("/songs")
 def all_songs():
@@ -80,9 +96,20 @@ def search_songs(q: str):
 
 @app.get("/recommend/{track_id}")
 def recommend(track_id: str):
-    # TODO: Replace with KNN recommender
-    return all_songs()[:10]
-
+    print(MODEL_PATH)
+    model = joblib.load(MODEL_PATH)
+    song_features = get_song_by_id(track_id)
+    feature_keys=['popularity','duration_ms','danceability','energy','key','loudness','mode','speechiness','acousticness','instrumentalness','liveness','valence','tempo','time_signature']
+    features = []
+    for fk in feature_keys:
+        features.append(song_features[0][fk])
+    print(features)
+    distances, indices = model.kneighbors([features])
+    print(indices)
+    return fetch_all(
+        "SELECT * FROM songs WHERE track_id IN (%s)",
+        (indices),
+    )
 
 @app.get("/predict-features/{track_id}")
 def predict_features(track_id: str):
